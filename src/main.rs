@@ -1,14 +1,15 @@
 mod db;
 
 use axum::{
-    routing::{get, post},
-    http::{HeaderValue, Method, StatusCode},
+    routing::get,
+    http::{HeaderValue, Method},
     Json, Router,
     extract::State,
 };
+use tokio::net::TcpListener;
 use db::{AppState, Post};
 use dotenv::dotenv;
-use serde::{Deserialize, Serialize};
+
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
@@ -53,10 +54,9 @@ async fn main() {
     println!("Server listening on {}", addr);
 
     // 启动服务器
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(&addr).await.unwrap();
+    println!("Server listening on {}", addr);
+    axum::serve(listener, app).await.unwrap();
 }
 
 // 健康检查接口

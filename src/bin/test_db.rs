@@ -1,10 +1,13 @@
 use mongodb::{bson::doc, options::{ClientOptions, ServerApi, ServerApiVersion}, Client};
+use std::env;
 
 #[tokio::main]
 async fn main() -> mongodb::error::Result<()> {
-  let mut client_options =
-    ClientOptions::parse("mongodb+srv://xulang:xl199504@cluster0.vkbsgmx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-      .await?;
+  // 从环境变量读取 MongoDB URI
+  let mongodb_uri = env::var("MONGODB_URI")
+    .expect("MONGODB_URI environment variable must be set");
+  
+  let mut client_options = ClientOptions::parse(&mongodb_uri).await?;
 
   // Set the server_api field of the client_options object to set the version of the Stable API on the client
   let server_api = ServerApi::builder().version(ServerApiVersion::V1).build();
@@ -29,4 +32,4 @@ async fn main() -> mongodb::error::Result<()> {
   }
 
   Ok(())
-} 
+}
